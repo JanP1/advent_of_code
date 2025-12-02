@@ -13,13 +13,14 @@ fn main() {
 
 }
 
-fn file_input_rotation<R>(reader: BufReader<R>, current_number: i32) where R: Read {
+fn file_input_rotation<R>(reader: BufReader<R>, mut current_number: i32) where R: Read {
     let mut zero_count = 0;
     for line in reader.lines() {
         match line {
             Ok(l) => { 
                 let l = split_line(&l);
-                if rotate(l.0, l.1, current_number) == 0 {
+                current_number = rotate(l.0, l.1, current_number);
+                if current_number  == 0 {
                     zero_count += 1;
                 }
                 
@@ -45,6 +46,7 @@ fn read_file(path: &str) -> Result<BufReader<File>, std::io::Error> {
     Ok(BufReader::new(File::open(path)?))
 }
 
+
 fn rotate(direction: char, num: i32, current_number: i32) -> i32 {
 
     match direction {
@@ -57,7 +59,6 @@ fn rotate(direction: char, num: i32, current_number: i32) -> i32 {
 }
 
 
-#[allow(dead_code)]
 fn wrap_number(num: i32) -> i32 {
     let range = 100;
         let mut value = num;
