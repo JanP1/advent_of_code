@@ -1,0 +1,18 @@
+# Rust build
+/target/
+
+# Cargo
+**/*.rs.bk
+Cargo.lock        # ignore only for libraries; keep for apps if you prefer
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
