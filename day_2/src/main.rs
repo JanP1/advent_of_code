@@ -1,4 +1,6 @@
-use std::{io::Read, u32};
+// #![allow(warnings)]
+
+use std::{io::Read};
 use utf8_read::Reader;
 
 // Struct to keep track of all invalid ids in the specified ranges
@@ -15,7 +17,7 @@ struct InvalidIdManager {
 
 impl InvalidIdManager {
     
-    fn sum_of_invalid_ids<R>(&mut self, reader: &mut Reader<R>) -> u32 where R: Read {
+    fn sum_of_invalid_ids<R>(&mut self, reader: &mut Reader<R>) -> u64 where R: Read {
         
         self.sum = 0;
         self.lower_b = "".to_string();
@@ -34,7 +36,19 @@ impl InvalidIdManager {
             }
         }
 
-        0
+
+        // At the end check for the last range
+        if !self.lower_b.is_empty() || !self.upper_b.is_empty() {
+            println!("Lower b completed {}", self.l_b_completed);
+            if self.l_b_completed {
+                println!("Self upper = {}", self.upper_b);
+                self.num_u_b = self.upper_b.trim().parse::<u64>().unwrap_or(0);
+                self.l_b_completed = false;
+                Self::sum_wrong_ids_in_range(self);
+            }
+        }
+
+        self.sum
     }
 
 
@@ -60,7 +74,7 @@ impl InvalidIdManager {
                 // the value for storing the chars is set back to empty
                 self.upper_b = "".to_string();
 
-                Self::sum_wrong_ids_in_range(&self);
+                Self::sum_wrong_ids_in_range(self);
 
             }
             _ => {
@@ -73,29 +87,35 @@ impl InvalidIdManager {
         }
     }
 
-    fn sum_wrong_ids_in_range(&self) {
+    fn sum_wrong_ids_in_range(&mut self) {
 
         // if both bounds are of the same uneven length there will be no invalid ids
         // and we would skip
         let lower_bound = self.num_l_b.to_string();
         let upper_bound = self.num_u_b.to_string();
 
-        if  !( lower_bound.len() == self.num_u_b.to_string().len() && lower_bound.len() % 2 == 1 ) {
-            print!("Calculating for range ... ");
+        println!("Lower b {lower_bound} Upper b {upper_bound}");
 
+        if  !( lower_bound.len() == upper_bound.to_string().len() && lower_bound.len() % 2 == 1 ) {
 
-            // TODO first we need to find if the upper and/or lower bounds are not uneven, if yes, 
-            // we need to find real_lower_bound and real_upper_bound
+            for num in self.num_l_b..=self.num_u_b {
+                let mut num_str = num.to_string();
+                if num_str.len() % 2 == 0 {
+                    let second_half = num_str.split_off(num_str.len()/2);
 
-            // splitting the number in two parts to create a real bound
-            let upper_char_vec = upper_bound.chars().collect::<Vec<char>>();
-            println!("{:?}", &upper_char_vec[..upper_char_vec.len()/2])
+                    // if the 2 parts are the same add to sum
+                    if num_str == second_half {
+                        println!("Adding - {num}");
+                        self.sum += num;
 
-        } else {
-            print!("Skipping for range ... ")
+                    }
+                   
+
+                }
+
+            }
+
         }
-
-        println!("{} - {}", self.num_l_b, self.num_u_b);
 
     }
 }
