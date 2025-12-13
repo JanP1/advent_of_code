@@ -9,8 +9,11 @@ fn main() {
 
     let mut printing_department = PrintingDepartment::default();
 
-    printing_department.calculate_accessible_rolls(reader);
-    println!("{}", printing_department.sum_acc_rolls);
+    match printing_department.calculate_accessible_rolls(reader) {
+        Ok(_) => {println!("Accesible rolls {}", printing_department.sum_acc_rolls)}
+        Err(e) => {println!("{e}")}
+
+    };
 
 }
 
